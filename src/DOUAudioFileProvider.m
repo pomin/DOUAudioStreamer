@@ -557,7 +557,7 @@ static void audio_file_stream_packets_proc(void *inClientData,
     
   NSString *path = [DOUAudioFileProvider cachedPathForUrl:audioFileURL];
   BOOL isDirectory = NO;
-  if ([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory] || !isDirectory)
+  if ([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory] && !isDirectory)
   {
     [audioFile setAudioFileURL:[NSURL fileURLWithPath:path]];
   }
