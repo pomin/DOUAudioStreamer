@@ -215,9 +215,25 @@ static BOOL gLastProviderIsFinished = NO;
 
 + (NSString *)_cachedPathForAudioFileURL:(NSURL *)audioFileURL
 {
-  NSString *filename = [NSString stringWithFormat:@"douas-%@.tmp", [self _sha256ForAudioFileURL:audioFileURL]];
-  return [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
+    NSString *filename = [NSString stringWithFormat:@"same-douas-%@.tmp", [self _sha256ForAudioFileURL:audioFileURL]];
+    NSString *cachesPath = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"SameFileCache"];
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:cachesPath])
+    {
+        [[NSFileManager defaultManager] createDirectoryAtPath:cachesPath
+                                  withIntermediateDirectories:YES
+                                                   attributes:nil
+                                                        error:nil];
+    }
+    
+    return [cachesPath stringByAppendingPathComponent:filename];
 }
+
+//+ (NSString *)_cachedPathForAudioFileURL:(NSURL *)audioFileURL
+//{
+//  NSString *filename = [NSString stringWithFormat:@"douas-%@.tmp", [self _sha256ForAudioFileURL:audioFileURL]];
+//  return [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
+//}
 
 - (void)_invokeEventBlock
 {
@@ -291,7 +307,7 @@ static BOOL gLastProviderIsFinished = NO;
   _receivedLength += bytesToWrite;
 
   if (_sha256Ctx != NULL) {
-    CC_SHA256_Update(_sha256Ctx, [data bytes], (CC_LONG)[data length]);
+//    CC_SHA256_Update(_sha256Ctx, [data bytes], (CC_LONG)[data length]);
   }
 
   if (!_readyToProducePackets && !_failed && !_requiresCompleteFile) {
@@ -523,6 +539,11 @@ static void audio_file_stream_packets_proc(void *inClientData,
 @synthesize receivedLength = _receivedLength;
 @synthesize failed = _failed;
 
++ (NSString *)cachedPathForUrl:(NSURL *)url
+{
+    return [_DOUAudioRemoteFileProvider _cachedPathForAudioFileURL:url];
+}
+
 + (instancetype)_fileProviderWithAudioFile:(id <DOUAudioFile>)audioFile
 {
   if (audioFile == nil) {
@@ -532,6 +553,13 @@ static void audio_file_stream_packets_proc(void *inClientData,
   NSURL *audioFileURL = [audioFile audioFileURL];
   if (audioFileURL == nil) {
     return nil;
+  }
+    
+  NSString *path = [DOUAudioFileProvider cachedPathForUrl:audioFileURL];
+  BOOL isDirectory = NO;
+  if ([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory] || !isDirectory)
+  {
+    [audioFile setAudioFileURL:[NSURL fileURLWithPath:path]];
   }
 
   if ([audioFileURL isFileURL]) {

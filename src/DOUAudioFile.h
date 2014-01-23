@@ -23,6 +23,7 @@
 @required
 
 - (NSURL *)audioFileURL;
+- (void)setAudioFileURL:(NSURL *)url;
 
 @optional
 

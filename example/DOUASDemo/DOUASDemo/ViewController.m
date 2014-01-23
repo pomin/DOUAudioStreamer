@@ -33,6 +33,11 @@ static void *kBufferingRatioKVOKey = &kBufferingRatioKVOKey;
 {
   return [self url];
 }
+
+- (void)setAudioFileURL:(NSURL *)url
+{
+  [self setUrl:url];
+}
 @end
 
 @interface ViewController () {
