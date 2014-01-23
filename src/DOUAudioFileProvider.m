@@ -307,7 +307,7 @@ static BOOL gLastProviderIsFinished = NO;
   _receivedLength += bytesToWrite;
 
   if (_sha256Ctx != NULL) {
-//    CC_SHA256_Update(_sha256Ctx, [data bytes], (CC_LONG)[data length]);
+    CC_SHA256_Update(_sha256Ctx, [data bytes], (CC_LONG)[data length]);
   }
 
   if (!_readyToProducePackets && !_failed && !_requiresCompleteFile) {
@@ -560,13 +560,15 @@ static void audio_file_stream_packets_proc(void *inClientData,
   if ([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDirectory] && !isDirectory)
   {
     [audioFile setAudioFileURL:[NSURL fileURLWithPath:path]];
-  }
-
-  if ([audioFileURL isFileURL]) {
     return [[_DOUAudioLocalFileProvider alloc] _initWithAudioFile:audioFile];
   }
   else {
-    return [[_DOUAudioRemoteFileProvider alloc] _initWithAudioFile:audioFile];
+    if ([audioFileURL isFileURL]) {
+      return [[_DOUAudioLocalFileProvider alloc] _initWithAudioFile:audioFile];
+    }
+    else {
+     return [[_DOUAudioRemoteFileProvider alloc] _initWithAudioFile:audioFile];
+    }
   }
 }
 

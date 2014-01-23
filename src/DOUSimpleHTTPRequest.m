@@ -28,7 +28,7 @@ static struct {
 
 static void *controller_main(void *info)
 {
-  pthread_setname_np("com.douban.simple-http-request.controller");
+  pthread_setname_np("com.same.simple-http-request.controller");
 
   pthread_mutex_lock(&controller.mutex);
   controller.runloop = CFRunLoopGetCurrent();

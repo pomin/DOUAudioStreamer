@@ -66,12 +66,23 @@ static void *kBufferingRatioKVOKey = &kBufferingRatioKVOKey;
 
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://douban.fm/j/mine/playlist?type=n&channel=0&context=channel:0%7Cmusician_id:103658&from=mainsite"]];
-    NSData *data = [NSURLConnection sendSynchronousRequest:request
-                                         returningResponse:NULL
-                                                     error:NULL];
-    NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[string dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL];
+//    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://douban.fm/j/mine/playlist?type=n&channel=0&context=channel:0%7Cmusician_id:103658&from=mainsite"]];
+//    NSData *data = [NSURLConnection sendSynchronousRequest:request
+//                                         returningResponse:NULL
+//                                                     error:NULL];
+//    NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+//    NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[string dataUsingEncoding:NSUTF8StringEncoding] options:0 error:NULL];
+      
+      //初始化文件路径。
+      NSString *path  = [[NSBundle mainBundle] pathForResource:@"playlist" ofType:@"json"];
+      
+      NSData *data = [NSData dataWithContentsOfFile:path];
+      //将文件内容读取到字符串中，注意编码NSUTF8StringEncoding 防止乱码，
+      NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+      
+      NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[string dataUsingEncoding:NSUTF8StringEncoding]
+                                                           options:0
+                                                             error:NULL];
 
     NSMutableArray *allTracks = [NSMutableArray array];
     for (NSDictionary *song in [dict objectForKey:@"song"]) {
